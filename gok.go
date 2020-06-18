@@ -2,12 +2,29 @@ package main
 
 import (
   "fmt"
+  "io"
+  "io/ioutil"
+  "log"
   "regexp"
   "strings"
+  "os"
 )
 
 func main() {
-  Parse("# xyz\n## abc def\n  \t\n## ghi\r### jkl\n## mno\r\npqr")
+  if len(os.Args) > 1 {
+    content, err := ioutil.ReadFile(os.Args[1])
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    res := Parse(string(content))
+
+    if len(os.Args) == 3 {
+      WriteToFile(os.Args[2], res)
+    } else {
+      fmt.Print(res)
+    }
+  }
 }
 
 type BlockType int
@@ -29,7 +46,7 @@ type Block struct {
   Value string
 }
 
-func Parse(source string) {
+func Parse(source string) string {
   blocks := make(chan Block)
   go Lex(source, blocks)
 
@@ -55,7 +72,22 @@ func Parse(source string) {
     }
     out = strings.Join([]string{out, "\n"}, "")
   }
-  fmt.Println(out)
+
+  return out
+}
+
+func WriteToFile(filename string, data string) error {
+    file, err := os.Create(filename)
+    if err != nil {
+        return err
+    }
+    defer file.Close()
+
+    _, err = io.WriteString(file, data)
+    if err != nil {
+        return err
+    }
+    return file.Sync()
 }
 
 var (
