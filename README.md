@@ -1,4 +1,14 @@
 # Gok
 
-Gok (gawk) is a CommonMark lexer and parser implementation focused on
-extensibility through minimalism and modularity.
+**Gok** (*gawk*) parses a subset of **GitHub Flavored Markdown** (**GFM**).
+
+## Features
+
+- [x] Headings
+- [x] Paragraphs
+- [ ] Quoting text
+- [ ] Quoting code
+- [ ] Lists
+- [ ] Links
+- [ ] Section links
+- [ ] Relative links
