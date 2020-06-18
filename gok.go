@@ -11,20 +11,31 @@ import (
 )
 
 func main() {
-  if len(os.Args) > 1 {
-    content, err := ioutil.ReadFile(os.Args[1])
-    if err != nil {
-        log.Fatal(err)
-    }
+  input, output := processArgs(os.Args[1:])
 
-    res := Parse(string(content))
-
-    if len(os.Args) == 3 {
-      WriteToFile(os.Args[2], res)
-    } else {
-      fmt.Print(res)
-    }
+  if src, err := ioutil.ReadFile(input); err != nil {
+    log.Fatal(err)
+  } else {
+    output(Parse(string(src)))
   }
+}
+
+func processArgs(args []string) (filename string, writer func(s string)) {
+  length := len(args)
+  
+  if length < 1 {
+    log.Fatal("Error: Missing input filename argument.")
+  }
+
+  filename = args[0]
+
+  if length == 1 {
+    writer = func(str string) { fmt.Print(str) }
+  } else {
+    writer = func(str string) { WriteToFile(args[1], str) }
+  }
+
+  return filename, writer
 }
 
 type BlockType int
